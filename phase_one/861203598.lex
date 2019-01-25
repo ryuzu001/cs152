@@ -64,7 +64,7 @@ notidentifier2	({letter}|{digit})({letter}|{digit}|[_]({letter}|{digit}))*[_]
 "<"			{printf("LT\n");currentCol++;}
 ">"			{printf("GT\n");currentCol++;}
 "<="			{printf("LTE\n");currentCol+=2;}
-">="			{printf("GTE\n");currentCol+=2;}
+">="			{printf("GTE\n");currentCoin a file named mini_l.y.l+=2;}
 
 {identifier}		{printf("IDENT %s\n", yytext);currentCol+=yyleng;}
 {number}		{printf("NUMBER %s\n", yytext);currentCol+=yyleng;}

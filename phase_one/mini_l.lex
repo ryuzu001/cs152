@@ -83,6 +83,5 @@ identifier	{letter}(({letter}|{digit}|[_])*({letter}|{digit}))*
 int main()
 {
 	yylex();
-	printf("lines: %d\n", currentLine);
 	return 0;
 }

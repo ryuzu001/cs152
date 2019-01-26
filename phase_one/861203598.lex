@@ -54,7 +54,7 @@ notidentifier2	({letter}|{digit})({letter}|{digit}|[_]({letter}|{digit}))*[_]
 "return"		{printf("RETURN\n");currentCol+=yyleng;}
 
 "-"			{printf("SUB\n");currentCol++;}
-"+"			{printf("ADD", currentCol);currentCol++;}
+"+"			{printf("ADD\n");currentCol++;}
 "*"			{printf("MULT\n");currentCol++;}
 "/"			{printf("DIV\n");currentCol++;}
 "%"			{printf("MOD\n");currentCol++;}
@@ -64,7 +64,7 @@ notidentifier2	({letter}|{digit})({letter}|{digit}|[_]({letter}|{digit}))*[_]
 "<"			{printf("LT\n");currentCol++;}
 ">"			{printf("GT\n");currentCol++;}
 "<="			{printf("LTE\n");currentCol+=2;}
-">="			{printf("GTE\n");currentCoin a file named mini_l.y.l+=2;}
+">="			{printf("GTE\n");currentCol+=2;}
 
 {identifier}		{printf("IDENT %s\n", yytext);currentCol+=yyleng;}
 {number}		{printf("NUMBER %s\n", yytext);currentCol+=yyleng;}
@@ -76,7 +76,7 @@ notidentifier2	({letter}|{digit})({letter}|{digit}|[_]({letter}|{digit}))*[_]
 ")"			{printf("R_PAREN\n");currentCol++;}
 "["			{printf("L_SQUARE_BRACKET\n");currentCol++;}
 "]"			{printf("R_SQUARE_BRACKET\n");currentCol++;}
-":="			{printf("ASSIGN");currentCol+=2;}
+":="			{printf("ASSIGN\n");currentCol+=2;}
 
 {notidentifier}		{printf("Error at line %d, column %d: identifier \"%s\" must begin with a letter\n", currentLine, currentCol, yytext); exit(0);}
 {notidentifier2}		{printf("Error at line %d, column %d: identifier \"%s\" cannot end with an underscore\n", currentLine, currentCol, yytext); exit(0);}

@@ -28,3 +28,6 @@ line:		FUNCTION	{printf("function here.\n");}
 int main(){
 	return yyparse();
 }
+void yyerror(const char *msg) {
+   printf("error");
+}

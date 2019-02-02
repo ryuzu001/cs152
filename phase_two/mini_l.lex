@@ -23,11 +23,11 @@ identifier	{letter}(({letter}|{digit}|[_])*({letter}|{digit}))*
 [\n]			{currentLine++;currentCol = 1;}
 "##"[^\n]*		{}			// ignore comments
 
-"function"		{currentCol+=8;return FUNCTION;}
-"beginparams"		{currentCol+=11;return BEGINPARAMS;}
-"endparams"		{currentCol+=9;return ENDPARAMS;}
-"beginlocals"		{currentCol+=11;return BEGINLOCALS;}
-"endlocals"		{printf("END_LOCALS\n");currentCol+=9;}
+"function"		{currentCol+=8; return FUNCTION;}
+"beginparams"		{currentCol+=11; return BEGIN_PARAMS;}
+"endparams"		{currentCol+=9; return END_PARAMS;}
+"beginlocals"		{currentCol+=11; return BEGIN_LOCALS;}
+"endlocals"		{currentCol+=9; return END_LOCALS;}
 "beginbody"		{printf("BEGIN_BODY\n");currentCol+=9;}
 "endbody"		{printf("END_BODY\n");currentCol+=7;}
 "integer"		{printf("INTEGER\n");currentCol+=7;}

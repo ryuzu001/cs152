@@ -5,6 +5,7 @@
 */
 
 %{
+	#include "y.tab.h"
 	int currentLine = 1;
 	int currentCol = 1;
 %}

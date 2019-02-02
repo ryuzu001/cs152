@@ -8,6 +8,7 @@ void yyerror(char * s);
 %union{ int num; char* id; }
 
 // from https://www.cs.ucr.edu/~amazl001/teaching/webpages1/token_list_format.html
+// https://www.youtube.com/watch?v=__-wUHG2rfM
 
 %start	line
 %token	FUNCTION BEGIN_PARAMS END_PARAMS BEGIN_LOCALS END_LOCALS BEGIN_BODY END_BODY INTEGER ARRAY OF IF THEN ENDIF ELSE WHILE DO BEGINLOOP ENDLOOP CONTINUE READ WRITE AND OR NOT TRUE FALSE RETURN

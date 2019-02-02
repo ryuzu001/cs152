@@ -3,6 +3,7 @@ void yyerror(char * s);
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+extern int yylex();
 %}
 
 %union{ int num; char* id; }

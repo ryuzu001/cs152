@@ -81,8 +81,3 @@ identifier	{letter}(({letter}|{digit}|[_])*({letter}|{digit}))*
 %%
 
 
-int main()
-{
-	yylex();
-	return 0;
-}

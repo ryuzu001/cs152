@@ -18,64 +18,64 @@ identifier	{letter}(({letter}|{digit}|[_])*({letter}|{digit}))*
 
 
 %%
-[ ]			{currentCol++;}			// ignore spaces
-[\t]			{currentCol++;}			// ignore tabs
-[\n]			{currentLine++;currentCol = 1;}
-"##"[^\n]*		{}			// ignore comments
+[ ]					{currentCol++;}			// ignore spaces
+[\t]				{currentCol++;}			// ignore tabs
+[\n]				{currentLine++;currentCol = 1;}
+"##"[^\n]*			{}			// ignore comments
 
-"function"		{currentCol+=8; return FUNCTION;}
+"function"			{currentCol+=8;  return FUNCTION;}
 "beginparams"		{currentCol+=11; return BEGIN_PARAMS;}
-"endparams"		{currentCol+=9; return END_PARAMS;}
+"endparams"			{currentCol+=9;  return END_PARAMS;}
 "beginlocals"		{currentCol+=11; return BEGIN_LOCALS;}
-"endlocals"		{currentCol+=9; return END_LOCALS;}
-"beginbody"		{printf("BEGIN_BODY\n");currentCol+=9;}
-"endbody"		{printf("END_BODY\n");currentCol+=7;}
-"integer"		{printf("INTEGER\n");currentCol+=7;}
-"array"			{printf("ARRAY\n");currentCol+=5;}
-"of"			{printf("OF\n");currentCol+=2;}
-"if"			{printf("IF\n");currentCol+=2;}
-"then"			{printf("THEN\n");currentCol+=4;}
-"endif"			{printf("ENDIF\n");currentCol+=5;}
-"else"			{printf("ELSE\n");currentCol+=4;}
-"while"			{printf("WHILE\n");currentCol+=5;}
-"do"			{printf("DO\n");currentCol+=2;}
-"beginloop"		{printf("BEGINLOOP\n");currentCol+=9;}
-"endloop"		{printf("ENDLOOP\n");currentCol+=7;}
-"continue"		{printf("CONTINUE\n");currentCol+=8;}
-"read"			{printf("READ\n");currentCol+=4;}
-"write"			{printf("WRITE\n");currentCol+=5;}
-"and"			{printf("AND\n");currentCol+=3;}
-"or"			{printf("OR\n");currentCol+=2;}
-"not"			{printf("NOT\n");currentCol+=3;}
-"true"			{printf("TRUE\n");currentCol+=4;}
-"false"			{printf("FALSE\n");currentCol+=5;}
-"return"		{printf("RETURN\n");currentCol+6;}
+"endlocals"			{currentCol+=9;  return END_LOCALS;}
+"beginbody"			{currentCol+=9;  return BEGIN_BODY;}
+"endbody"			{currentCol+=7;  return END_BODY;}
+"integer"			{currentCol+=7;  return INTEGER;}
+"array"				{currentCol+=5;  return ARRAY;}
+"of"				{currentCol+=2;  return OF;}
+"if"				{currentCol+=2;  return IF;}
+"then"				{currentCol+=4;  return THEN;}
+"endif"				{currentCol+=5;  return ENDIF;}
+"else"				{currentCol+=4;  return ELSE;}
+"while"				{currentCol+=5;  return WHILE;}
+"do"				{currentCol+=2;  return DO;}
+"beginloop"			{currentCol+=9;  return BEGINLOOP;}
+"endloop"			{currentCol+=7;  return ENDLOOP;}
+"continue"			{currentCol+=8;  return CONTINUE;}
+"read"				{currentCol+=4;  return READ;}
+"write"				{currentCol+=5;  return WRITE;}
+"and"				{currentCol+=3;  return AND;}
+"or"				{currentCol+=2;  return OR;}
+"not"				{currentCol+=3;  return NOT;}
+"true"				{currentCol+=4;  return TRUE;}
+"false"				{currentCol+=5;  return FALSE;}
+"return"			{currentCol+=6;  return RETURN;}
 
-"-"			{printf("SUB\n");currentCol++;}
-"+"			{printf("ADD\n");currentCol++;}
-"*"			{printf("MULT\n");currentCol++;}
-"/"			{printf("DIV\n");currentCol++;}
-"%"			{printf("MOD\n");currentCol++;}
+"-"					{currentCol++;   return SUB;}
+"+"					{currentCol++;   return ADD;}
+"*"					{currentCol++;   return MULT;}
+"/"					{currentCol++;   return DIV;}
+"%"					{currentCol++;   return MOD;}
 
-"=="			{printf("EQ\n");currentCol+=2;}
-"<>"			{printf("NEQ\n");currentCol+=2;}
-"<"			{printf("LT\n");currentCol++;}
-">"			{printf("GT\n");currentCol++;}
-"<="			{printf("LTE\n");currentCol+=2;}
-">="			{printf("GTE\n");currentCol+=2;}
+"=="				{currentCol+=2;  return EQ;}
+"<>"				{currentCol+=2;  return NEQ;}
+"<"					{currentCol++;   return LT;}
+">"					{currentCol++;   return GT;}
+"<="				{currentCol+=2;  return LTE;}
+">="				{currentCol+=2;  return GTE;}
+	
+{identifier}		{yylval.ident = (yytext);return IDENT;}
+{number}			{yylval.num = atoi(yytext); return NUMBER;}
 
-{identifier}		{printf("IDENT %s\n", yytext);currentCol+=yyleng;}
-{number}		{printf("NUMBER %s\n", yytext);currentCol+=yyleng;}
-
-";"			{printf("SEMICOLON\n");currentCol++;}
-":"			{printf("COLON\n");currentCol++;}
-","			{printf("COMMA\n");currentCol++;}
-"("			{printf("L_PAREN\n");currentCol++;}
-")"			{printf("R_PAREN\n");currentCol++;}
-"["			{printf("L_SQUARE_BRACKET\n");currentCol++;}
-"]"			{printf("R_SQUARE_BRACKET\n");currentCol++;}
-":="			{printf("ASSIGN\n");currentCol+=2;}
-.			{printf("Error at line %d, column %d: unrecognized symbol \"%s\"", currentLine, currentCol,yytext);exit(0);}
+";"					{currentCol++;  return SEMICOLON;}
+":"					{currentCol++;  return COLON;}
+","					{currentCol++;  return COMMA;}
+"("					{currentCol++;  return L_PAREN;}
+")"					{currentCol++;  return R_PAREN;}
+"["					{currentCol++;  return L_SQUARE_BRACKET;}
+"]"					{currentCol++;  return R_SQUARE_BRACKET;}
+":="				{currentCol+=2; return ASSIGN;}
+.					{printf("Error at line %d, column %d: unrecognized symbol \"%s\"", currentLine, currentCol,yytext);exit(0);}
 
 
 %%

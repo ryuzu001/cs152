@@ -64,10 +64,13 @@ expression:			multiplicative_expression	{printf("expression -> multiplicative_ex
 multiplicative_expression:	term	{printf("multiplicative_expression -> term\n");}
 				| term MOD term	{printf("multiplicative_expression -> term MOD term\n");}
 				| term MULT term {printf("multiplicative_expression -> term MULT term\n");}
+				| term DIV term {printf("multiplicative_expression -> term DIV term\n");}
 				;
 term:				NUMBER	{printf("term -> NUMBER\n");}
 				| var {printf("term -> var\n");}
 				| L_PAREN expression R_PAREN {printf("term -> L_PAREN expression R_PAREN\n");}
+				| ident L_PAREN expression R_PAREN {printf("term -> ident L_PAREN expression R_PAREN\n");}
+				| SUB term	{printf("term -> SUB term\n");}
 				;
 vars:				var COMMA vars	{printf("vars -> var COMMA vars\n");}
 				| var		{printf("vars -> var\n");}

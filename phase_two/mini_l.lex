@@ -75,7 +75,7 @@ identifier	{letter}(({letter}|{digit}|[_])*({letter}|{digit}))*
 "["					{currentCol++;  return L_SQUARE_BRACKET;}
 "]"					{currentCol++;  return R_SQUARE_BRACKET;}
 ":="				{currentCol+=2; return ASSIGN;}
-.					{printf("Error at line %d, column %d: unrecognized symbol \"%s\"", currentLine, currentCol,yytext);exit(0);}
+.					{printf("Error at line %d, column %d: unrecognized symbol \"%s\"\n", currentLine, currentCol,yytext);exit(0);}
 
 
 %%

@@ -1,83 +1,103 @@
-/*
-	Ryan Yuzuki
-	ryuzu001@ucr.edu
-	CS152 Winter 2019
-*/
-
 %{
-	#include "y.tab.h"
-	int currentLine = 1;
-	int currentCol = 1;
+#include <iostream>
+#define YY_DECL yy::parser::symbol_type yylex()
+#include "parser.tab.hh"
+
+static yy::location loc;
+
+int currentLine = 1;
+int currentCol = 1;
 %}
 
+%option noyywrap 
 
+%{
+#define YY_USER_ACTION loc.columns(yyleng);
+%}
+
+	/* your definitions here */
 digit		[0-9]
 letter		[a-zA-Z]
 number		{digit}*
 identifier	{letter}(({letter}|{digit}|[_])*({letter}|{digit}))*	
-
+	/* your definitions end */
 
 %%
+
+%{
+loc.step(); 
+%}
+
+	/* your rules here */
+
+	/* use this structure to pass the Token :
+	 * return yy::parser::make_TokenName(loc)
+	 * if the token has a type you can pass the
+	 * as the first argument. as an example we put
+	 * the rule to return token function.
+	 */
 [ ]					{currentCol++;}			// ignore spaces
-[\t]				{currentCol++;}			// ignore tabs
-[\n]				{currentLine++;currentCol = 1;}
-"##"[^\n]*			{}			// ignore comments
-
-"function"			{currentCol+=8;  return FUNCTION;}
-"beginparams"		{currentCol+=11; return BEGIN_PARAMS;}
-"endparams"			{currentCol+=9;  return END_PARAMS;}
-"beginlocals"		{currentCol+=11; return BEGIN_LOCALS;}
-"endlocals"			{currentCol+=9;  return END_LOCALS;}
-"beginbody"			{currentCol+=9;  return BEGIN_BODY;}
-"endbody"			{currentCol+=7;  return END_BODY;}
-"integer"			{currentCol+=7;  return INTEGER;}
-"array"				{currentCol+=5;  return ARRAY;}
-"of"				{currentCol+=2;  return OF;}
-"if"				{currentCol+=2;  return IF;}
-"then"				{currentCol+=4;  return THEN;}
-"endif"				{currentCol+=5;  return ENDIF;}
-"else"				{currentCol+=4;  return ELSE;}
-"while"				{currentCol+=5;  return WHILE;}
-"do"				{currentCol+=2;  return DO;}
-"beginloop"			{currentCol+=9;  return BEGINLOOP;}
-"endloop"			{currentCol+=7;  return ENDLOOP;}
-"continue"			{currentCol+=8;  return CONTINUE;}
-"read"				{currentCol+=4;  return READ;}
-"write"				{currentCol+=5;  return WRITE;}
-"and"				{currentCol+=3;  return AND;}
-"or"				{currentCol+=2;  return OR;}
-"not"				{currentCol+=3;  return NOT;}
-"true"				{currentCol+=4;  return TRUE;}
-"false"				{currentCol+=5;  return FALSE;}
-"return"			{currentCol+=6;  return RETURN;}
-
-"-"					{currentCol++;   return SUB;}
-"+"					{currentCol++;   return ADD;}
-"*"					{currentCol++;   return MULT;}
-"/"					{currentCol++;   return DIV;}
-"%"					{currentCol++;   return MOD;}
-
-"=="				{currentCol+=2;  return EQ;}
-"<>"				{currentCol+=2;  return NEQ;}
-"<"					{currentCol++;   return LT;}
-">"					{currentCol++;   return GT;}
-"<="				{currentCol+=2;  return LTE;}
-">="				{currentCol+=2;  return GTE;}
+[\t]					{currentCol++;}			// ignore tabs
+[\n]					{currentLine++;currentCol = 1;}
+"##"[^\n]*				{}			// ignore comments
 	
-{identifier}		{yylval.ident = (yytext);return IDENT;}
-{number}			{yylval.num = atoi(yytext); return NUMBER;}
+"function"				{currentCol+=8;  return yy::parser::make_FUNCTION(loc);}
+"beginparams"				{currentCol+=11; return yy::parser::make_BEGIN_PARAMS(loc);}
+"endparams"				{currentCol+=9;  return yy::parser::make_END_PARAMS(loc);}
+"beginlocals"				{currentCol+=11; return yy::parser::make_BEGIN_LOCALS(loc);}
+"endlocals"				{currentCol+=9;  return yy::parser::make_END_LOCALS(loc);}
+"beginbody"				{currentCol+=9;  return yy::parser::make_BEGIN_BODY(loc);}
+"endbody"				{currentCol+=7;  return yy::parser::make_END_BODY(loc);}
+"integer"				{currentCol+=7;  return yy::parser::make_INTEGER(loc);}
+"array"					{currentCol+=5;  return yy::parser::make_ARRAY(loc);}
+"of"					{currentCol+=2;  return yy::parser::make_OF(loc);}
+"if"					{currentCol+=2;  return yy::parser::make_IF(loc);}
+"then"					{currentCol+=4;  return yy::parser::make_THEN(loc);}
+"endif"					{currentCol+=5;  return yy::parser::make_ENDIF(loc);}
+"else"					{currentCol+=4;  return yy::parser::make_ELSE(loc);}
+"while"					{currentCol+=5;  return yy::parser::make_WHILE(loc);}
+"do"					{currentCol+=2;  return yy::parser::make_DO(loc);}
+"beginloop"				{currentCol+=9;  return yy::parser::make_BEGINLOOP(loc);}
+"endloop"				{currentCol+=7;  return yy::parser::make_ENDLOOP(loc);}
+"continue"				{currentCol+=8;  return yy::parser::make_CONTINUE(loc);}
+"read"					{currentCol+=4;  return yy::parser::make_READ(loc);}
+"write"					{currentCol+=5;  return yy::parser::make_WRITE(loc);}
+"and"					{currentCol+=3;  return yy::parser::make_AND(loc);}
+"or"					{currentCol+=2;  return yy::parser::make_OR(loc);}
+"not"					{currentCol+=3;  return yy::parser::make_NOT(loc);}
+"true"					{currentCol+=4;  return yy::parser::make_TRUE(loc);}
+"false"					{currentCol+=5;  return yy::parser::make_FALSE(loc);}
+"return"				{currentCol+=6;  return yy::parser::make_RETURN(loc);}
 
-";"					{currentCol++;  return SEMICOLON;}
-":"					{currentCol++;  return COLON;}
-","					{currentCol++;  return COMMA;}
-"("					{currentCol++;  return L_PAREN;}
-")"					{currentCol++;  return R_PAREN;}
-"["					{currentCol++;  return L_SQUARE_BRACKET;}
-"]"					{currentCol++;  return R_SQUARE_BRACKET;}
-":="				{currentCol+=2; return ASSIGN;}
-.					{printf("Error at line %d, column %d: unrecognized symbol \"%s\"\n", currentLine, currentCol,yytext);exit(0);}
+"-"					{currentCol++;   return yy::parser::make_SUB(loc);}
+"+"					{currentCol++;   return yy::parser::make_ADD(loc);}
+"*"					{currentCol++;   return yy::parser::make_MULT(loc);}
+"/"					{currentCol++;   return yy::parser::make_DIV(loc);}
+"%"					{currentCol++;   return yy::parser::make_MOD(loc);}
 
+"=="					{currentCol+=2;  return yy::parser::make_EQ(loc);}
+"<>"					{currentCol+=2;  return yy::parser::make_NEQ(loc);}
+"<"					{currentCol++;   return yy::parser::make_LT(loc);}
+">"					{currentCol++;   return yy::parser::make_GT(loc);}
+"<="					{currentCol+=2;  return yy::parser::make_LTE(loc);}
+">="					{currentCol+=2;  return yy::parser::make_GTE(loc);}
+	
+{identifier}				{return yy::parser::make_IDENT(loc);}
+{number}				{return yy::parser::make_NUM(loc);}
+
+";"					{currentCol++;  return yy::parser::make_SEMICOLON(loc);}
+":"					{currentCol++;  return yy::parser::make_COLON(loc);}
+","					{currentCol++;  return yy::parser::make_COMMA(loc);}
+"("					{currentCol++;  return yy::parser::make_L_PAREN(loc);}
+")"					{currentCol++;  return yy::parser::make_R_PAREN(loc);}
+"["					{currentCol++;  return yy::parser::make_L_SQUARE_BRACKET(loc);}
+"]"					{currentCol++;  return yy::parser::make_R_SQUARE_BRACKET(loc);}
+":="					{currentCol+=2; return yy::parser::make_ASSIGN(loc);}
+
+
+
+ <<EOF>>	{return yy::parser::make_END(loc);}
+	/* your rules end */
 
 %%
-
 

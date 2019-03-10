@@ -1,7 +1,6 @@
-parser: mini_l.lex mini_l.yy
-	bison -v -d --file-prefix=parser mini_l.yy
-	flex mini_l.lex
-	g++ -std=c++11 -o parser parser.tab.cc lex.yy.c -lfl
-
+parser: mini_l.lex mini_l.y
+		bison -v -d --file-prefix=y mini_l.y
+		flex mini_l.lex
+		g++ -o parser y.tab.c lex.yy.c -lfl --std=c++11
 clean:
-	rm -f lex.yy.c parser.tab.* parser.output *.o parser location.hh position.hh stack.hh 
+	rm -f lex.yy.c y.tab.c y.output .o parser y.tab.h

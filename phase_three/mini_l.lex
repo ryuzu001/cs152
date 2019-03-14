@@ -1,4 +1,6 @@
-
+/*
+   Ryan Yuzuki ryuzu001@ucr.edu
+*/
 %{
    #include "y.tab.h"
    int currLine = 1, currPosition = 1;
@@ -8,10 +10,10 @@
 digit		[0-9]
 letter		[a-zA-Z]
 number		{digit}*
-identifier {letter}(({letter}|{digit}|[_])*({letter}|{digit}))* 
+identifier [a-zA-Z][a-zA-Z0-9\_]*
 
 %%
-[\n]			{}
+[\n]			{currLine++;currPosition = 1;}
 [\t]+			{currPosition = yyleng;}
 "##".*				{currPosition += yyleng;}
 
@@ -28,7 +30,7 @@ identifier {letter}(({letter}|{digit}|[_])*({letter}|{digit}))*
 "endif"            {currPosition += yyleng; return ENDIF;}
 "else"            {currPosition += yyleng; return ELSE;}
 "while"            {currPosition += yyleng; return WHILE;}
-"do"            {currPosition += yyleng; return DO;}
+"do"            {currPosition += yyleng; return DO;} 
 "foreach"        {currPosition += yyleng; return FOREACH;}
 "in"            {currPosition += yyleng; return IN;}
 "beginbody"        {currPosition += yyleng; return BEGIN_BODY;}
@@ -67,7 +69,7 @@ identifier {letter}(({letter}|{digit}|[_])*({letter}|{digit}))*
 ")"            {currPosition += yyleng; return R_PAREN;}
 "["            {currPosition += yyleng; return L_SQUARE_BRACKET;}
 "]"            {currPosition += yyleng; return R_SQUARE_BRACKET;}
-":="            {currPosition += yyleng; return ASSIGN;}
+":="           {currPosition += yyleng; return ASSIGN;}
 " "				{currPosition += yyleng;}
 
 

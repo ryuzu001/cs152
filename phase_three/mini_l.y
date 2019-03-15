@@ -20,8 +20,8 @@
 	
    extern FILE * yyin;
 
-   string makeTemp();
-   string makeLabel();
+   void doTemp(string, string);
+   string doLabel();
 
 	string func_name;
    vector<string> ops;
@@ -100,15 +100,43 @@ int_or_array:     INTEGER { ident_vector_type.push_back("int"); }
 statements:       statement SEMICOLON statements
                   |
                   ;
-statement:        var ASSIGN expression { ident_vector2.push_back("= " + ident_vector_temp.back()); ident_vector_temp.pop_back();}
+statement:        var ASSIGN expression 
+                  {
+                     string t1 = ident_vector_temp.back();
+                     ident_vector_temp.pop_back();
+                     string t2 = ident_vector_temp.back();
+                     ident_vector_temp.pop_back();
+                     doTemp(t2, t1);
+                  }
+                  | WHILE bool_exp BEGINLOOP statements ENDLOOP
+                  {
+                     string i = doLabel();
+                     ident_vector2.push_back(": " + i);
+                  }
                   | READ var { ident_vector2.push_back(".< " + ident_vector_temp.back()); ident_vector_temp.pop_back();}
                   ;
-
+bool_exp:         relation_and_exp
+                  | bool_exp OR relation_and_exp {}
+                  ;
+relation_and_exp: relation_exp1
+                  | relation_and_exp AND relation_exp1 {}
+                  ;
+relation_exp1:    expression comp expression
+                  ;
+comp:             EQ {}
+                  | NEQ {}
+                  | LT {}
+                  | GT {}
+                  | LTE {}
+                  | GTE {}
+                  ;
 var:              IDENT 
                   {
                      string tempId = $1;
                      if(tempId.find(';') != string::npos)
                      tempId.erase(tempId.find(';'));
+                     if(tempId.find(" :=") != string::npos)
+                     tempId.erase(tempId.find(" :="));
                      ident_vector_temp.push_back(tempId);
                   }
                   | IDENT L_SQUARE_BRACKET expression R_SQUARE_BRACKET 
@@ -120,7 +148,9 @@ var:              IDENT
                         ops = ops*/
                   }
                   ;
-expression:       var  ;
+expression:       var  
+                  | var DIV var 
+                  ;
 
 
 %%
@@ -140,5 +170,13 @@ void yyerror(const char *msg) {
    printf("** Line %d, position %d: %s\n", currLine, currPosition, msg);
 }
 
-string makeTemp(){ return "__temp__" + to_string(numTemp++); }
-string makeLabel(){ return "__label__" + to_string(numLabel++); }
+void doTemp(string str1, string str2){
+   string tempStr = "__temp__" + to_string(numTemp);
+   ident_vector2.push_back(". " + tempStr);
+   ident_vector2.push_back("= " + tempStr + ", " + str2);
+   ident_vector2.push_back("= " + str1 + ", " + tempStr);
+   numTemp++;
+}
+string doLabel(){
+   return "__label__" + to_string(numLabel++);
+}

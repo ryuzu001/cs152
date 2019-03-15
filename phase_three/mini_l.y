@@ -20,15 +20,21 @@
 	
    extern FILE * yyin;
 
-   void doTemp(string, string);
+   void assignTemp(string, string);
+   string expressionTemp(string);
    string doLabel();
+   string declareTemp();
+   bool fromExp = false;
+   bool fromDiv = false;
 
-	string func_name;
+   string func_name;
    vector<string> ops;
    vector<string> ident_vector;
    vector<string> ident_vector_type;
    vector<string> ident_vector2;
    vector<string> ident_vector_temp;
+   vector<string> comp_stuff;
+   vector<string> label_vector_temp;
    int numTemp = 0;
    int numLabel = 0;
 
@@ -106,16 +112,44 @@ statement:        var ASSIGN expression
                      ident_vector_temp.pop_back();
                      string t2 = ident_vector_temp.back();
                      ident_vector_temp.pop_back();
-                     doTemp(t2, t1);
+                     assignTemp(t2, t1);
                   }
                   | WHILE bool_exp BEGINLOOP statements ENDLOOP
                   {
                      string i = doLabel();
                      ident_vector2.push_back(": " + i);
+		     if(fromDiv)
+		     {
+			string s1 = declareTemp();
+			string s2 = ident_vector_temp.back();
+			ident_vector_temp.pop_back();
+			string s3 = ident_vector_temp.back();
+			ident_vector_temp.pop_back();
+			ident_vector2.push_back("/ " + s1 + ", " + s3 + ", " + s2);
+ 			ident_vector_temp.push_back(s1);
+		     }
+		     while(comp_stuff.size() != 0){
+			comp_stuff.pop_back();
+			string s1 = declareTemp();
+		        string s2 = ident_vector_temp.back();
+			ident_vector_temp.pop_back();
+			string s3 = ident_vector_temp.back();
+			ident_vector_temp.pop_back();
+			ident_vector2.push_back("> " + s1 + ", " + s3 + ", " + s2);
+			ident_vector_temp.push_back(s1);
+
+			// loop part ?:
+			ident_vector2.push_back("?:= " + label_vector_temp.back() + ", " + ident_vector_temp.back());
+			label_vector_temp.pop_back();
+			string l1 = doLabel();
+			ident_vector2.push_back(":= " + label_vector_temp.back());
+			string l2 = doLabel();
+			ident_vector2.push_back(": " + l2);
+		     }
                   }
                   | READ var { ident_vector2.push_back(".< " + ident_vector_temp.back()); ident_vector_temp.pop_back();}
                   ;
-bool_exp:         relation_and_exp
+bool_exp:         relation_and_exp 
                   | bool_exp OR relation_and_exp {}
                   ;
 relation_and_exp: relation_exp1
@@ -126,18 +160,23 @@ relation_exp1:    expression comp expression
 comp:             EQ {}
                   | NEQ {}
                   | LT {}
-                  | GT {}
+                  | GT {comp_stuff.push_back("GT");}
                   | LTE {}
                   | GTE {}
                   ;
 var:              IDENT 
                   {
-                     string tempId = $1;
-                     if(tempId.find(';') != string::npos)
-                     tempId.erase(tempId.find(';'));
-                     if(tempId.find(" :=") != string::npos)
-                     tempId.erase(tempId.find(" :="));
-                     ident_vector_temp.push_back(tempId);
+		     if(fromExp){
+   			    ident_vector_temp.push_back(expressionTemp($1));
+		     }
+		     else{
+	                     string tempId = $1;
+        	             if(tempId.find(';') != string::npos)
+        	             tempId.erase(tempId.find(';'));
+        	             if(tempId.find(" :=") != string::npos)
+        	             tempId.erase(tempId.find(" :="));
+        	             ident_vector_temp.push_back(tempId);
+		     }
                   }
                   | IDENT L_SQUARE_BRACKET expression R_SQUARE_BRACKET 
                   {
@@ -148,9 +187,26 @@ var:              IDENT
                         ops = ops*/
                   }
                   ;
-expression:       var  
-                  | var DIV var 
+expressions:	  expression COMMA expressions
+		  | expression
+		  ;
+expression:       multip_exp
+		  | multip_exp ADD multip_exp
+		  | multip_exp SUB multip_exp
                   ;
+multip_exp:	  term
+		  | term DIV term {fromDiv = true;}
+		  | term MULT term
+		  | term MOD term
+		  ;
+term:		  | var {fromExp = true;}
+		  | NUMBER
+		  | L_PAREN expression R_PAREN
+		  | SUB var
+		  | SUB NUMBER
+		  | SUB L_PAREN expression R_PAREN
+		  | IDENT L_PAREN expressions R_PAREN
+		  ;
 
 
 %%
@@ -170,13 +226,31 @@ void yyerror(const char *msg) {
    printf("** Line %d, position %d: %s\n", currLine, currPosition, msg);
 }
 
-void doTemp(string str1, string str2){
+void assignTemp(string str1, string str2){
    string tempStr = "__temp__" + to_string(numTemp);
    ident_vector2.push_back(". " + tempStr);
    ident_vector2.push_back("= " + tempStr + ", " + str2);
    ident_vector2.push_back("= " + str1 + ", " + tempStr);
+   ident_vector_temp.push_back(tempStr);
    numTemp++;
 }
+string declareTemp(){
+   string tempStr = "__temp__" + to_string(numTemp);
+   numTemp++;
+   ident_vector2.push_back(". " + tempStr);
+   return tempStr;
+}
+string expressionTemp(string s1){
+   string tempStr = "__temp__" + to_string(numTemp);
+   numTemp++;
+   if(s1.find(" ") != string::npos)
+   s1.erase(s1.find(" "));
+   ident_vector2.push_back(". " + tempStr);
+   ident_vector2.push_back("= " + tempStr + ", " + s1);
+   return tempStr;
+}
 string doLabel(){
-   return "__label__" + to_string(numLabel++);
+   string s1 = "__label__" + to_string(numLabel++);
+   label_vector_temp.push_back(s1);
+   return s1;
 }

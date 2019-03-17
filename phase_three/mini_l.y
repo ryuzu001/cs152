@@ -209,21 +209,21 @@ vars:             var COMMA vars
                      string t = declareTemp();
                      ident_vector_type.push_back("int");
                   }
-                  | var
+                  |
                   ;
 var:              IDENT 
                   {
-                  if(fromExp){
-                        ident_vector_temp.push_back(expressionTemp($1));
-                  }
-                  else{
-                     string tempId = $1;
-                     if(tempId.find(';') != string::npos)
-                     tempId.erase(tempId.find(';'));
-                     if(tempId.find(" :=") != string::npos)
-                     tempId.erase(tempId.find(" :="));
-                     ident_vector_temp.push_back(tempId);
-                  }
+                     if(fromExp){
+                           ident_vector_temp.push_back(expressionTemp($1));
+                     }
+                     else{
+                        string tempId = $1;
+                        if(tempId.find(';') != string::npos)
+                        tempId.erase(tempId.find(';'));
+                        if(tempId.find(" :=") != string::npos)
+                        tempId.erase(tempId.find(" :="));
+                        ident_vector_temp.push_back(tempId);
+                     }
                   }
                   | IDENT L_SQUARE_BRACKET expression R_SQUARE_BRACKET 
                   {
@@ -234,7 +234,7 @@ var:              IDENT
                         ops = label_vector_temp */
                   }
                   ;
-expressions:	   expression COMMA expressions
+expressions:	   expressions COMMA expression
                   | expression
                   ;
 expression:       multip_exp
@@ -254,8 +254,7 @@ expression:       multip_exp
                   }
                   | multip_exp SUB multip_exp
                   ;
-multip_exp:	      term
-                  | term DIV term {
+multip_exp:	      term DIV term {
                      string s1 = declareTemp();
                      ident_vector_type.push_back("int");
                      string s2 = ident_vector_temp.back();
@@ -285,8 +284,9 @@ multip_exp:	      term
                      ident_vector2.push_back("* " + s1 + ", " + s2 + ", " + s3);
                      ident_vector_temp.push_back(s1);
                   }
+                  | term
                   ;
-term:	            | var {fromExp = true;}
+term:	            var {fromExp = true;}
                   | NUMBER
                   | L_PAREN expression R_PAREN
                   | SUB var

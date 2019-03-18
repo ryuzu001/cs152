@@ -75,6 +75,7 @@ function: 		   FUNCTION IDENT {func_name = string("func ") + $2;} SEMICOLON BEGI
                      for(unsigned i = 0; i < ident_vector2.size(); i++){
                         cout << ident_vector2.at(i) << endl;
                      }
+                     cout << "endfunc" << endl;
                   }
 			         ;
 declarations:     declaration SEMICOLON declarations
@@ -113,6 +114,22 @@ statement:        var ASSIGN expression
                      ident_vector_temp.pop_back();
                      assignTemp(t2, t1);
                   }
+                  | var ASSIGN L_PAREN expression R_PAREN DIV NUMBER
+                  {
+                     string t1 = ident_vector_temp.back();
+                     ident_vector_temp.pop_back();
+                     string t2 = ident_vector_temp.back();
+                     ident_vector_temp.pop_back();
+                     assignTemp(t2, t1);
+                  }
+                  | var ASSIGN L_PAREN expression R_PAREN MOD NUMBER
+                  {
+                     string t1 = ident_vector_temp.back();
+                     ident_vector_temp.pop_back();
+                     string t2 = ident_vector_temp.back();
+                     ident_vector_temp.pop_back();
+                     assignTemp(t2, t1);
+                  }
                   | WHILE bool_exp BEGINLOOP statements ENDLOOP
                   {
                      string i = doLabel();
@@ -127,14 +144,6 @@ statement:        var ASSIGN expression
                            ident_vector_temp.pop_back();
                            ident_vector2.push_back("> " + s1 + ", " + s3 + ", " + s2);
                            ident_vector_temp.push_back(s1);
-
-                           // loop part ?:
-                           ident_vector2.push_back("?:= " + label_vector_temp.back() + ", " + ident_vector_temp.back());
-                           label_vector_temp.pop_back();
-                           string l1 = doLabel();
-                           ident_vector2.push_back(":= " + label_vector_temp.back());
-                           string l2 = doLabel();
-                           ident_vector2.push_back(": " + l2);
                         }
                         if(comp_stuff.back() == "LTE"){
                            comp_stuff.pop_back();
@@ -145,16 +154,63 @@ statement:        var ASSIGN expression
                            ident_vector_temp.pop_back();
                            ident_vector2.push_back("<= " + s1 + ", " + s3 + ", " + s2);
                            ident_vector_temp.push_back(s1);
-
-                           // loop part ?:
-                           ident_vector2.push_back("?:= " + label_vector_temp.back() + ", " + ident_vector_temp.back());
-                           label_vector_temp.pop_back();
-                           string l1 = doLabel();
-                           ident_vector2.push_back(":= " + label_vector_temp.back());
-                           string l2 = doLabel();
-                           ident_vector2.push_back(": " + l2);
                         }
+                        if(comp_stuff.back() == "EQ"){
+                           comp_stuff.pop_back();
+                           string s1 = declareTemp();
+                           string s2 = ident_vector_temp.back();
+                           ident_vector_temp.pop_back();
+                           string s3 = ident_vector_temp.back();
+                           ident_vector_temp.pop_back();
+                           ident_vector2.push_back("== " + s1 + ", " + s3 + ", " + s2);
+                           ident_vector_temp.push_back(s1);
+                        }
+                        if(comp_stuff.back() == "NEQ"){
+                           comp_stuff.pop_back();
+                           string s1 = declareTemp();
+                           string s2 = ident_vector_temp.back();
+                           ident_vector_temp.pop_back();
+                           string s3 = ident_vector_temp.back();
+                           ident_vector_temp.pop_back();
+                           ident_vector2.push_back("!= " + s1 + ", " + s3 + ", " + s2);
+                           ident_vector_temp.push_back(s1);
+                        }
+                        if(comp_stuff.back() == "LT"){
+                           comp_stuff.pop_back();
+                           string s1 = declareTemp();
+                           string s2 = ident_vector_temp.back();
+                           ident_vector_temp.pop_back();
+                           string s3 = ident_vector_temp.back();
+                           ident_vector_temp.pop_back();
+                           ident_vector2.push_back("< " + s1 + ", " + s3 + ", " + s2);
+                           ident_vector_temp.push_back(s1);
+                        }
+                        if(comp_stuff.back() == "GTE"){
+                           comp_stuff.pop_back();
+                           string s1 = declareTemp();
+                           string s2 = ident_vector_temp.back();
+                           ident_vector_temp.pop_back();
+                           string s3 = ident_vector_temp.back();
+                           ident_vector_temp.pop_back();
+                           ident_vector2.push_back(">= " + s1 + ", " + s3 + ", " + s2);
+                           ident_vector_temp.push_back(s1);
+                        }
+                        // loop part ?:
+                        ident_vector2.push_back("?:= " + label_vector_temp.back() + ", " + ident_vector_temp.back());
+                        label_vector_temp.pop_back();
+                        string l1 = doLabel();
+                        ident_vector2.push_back(":= " + label_vector_temp.back());
+                        string l2 = doLabel();
+                        ident_vector2.push_back(": " + l2);
                      }
+                  }
+                  | IF L_PAREN bool_exp R_PAREN THEN statements ENDIF
+                  {
+                     string l1 = doLabel();
+                     string l2 = doLabel();
+                     ident_vector2.push_back("?: " + l1 + ", " + label_vector_temp.back());
+                     label_vector_temp.pop_back();
+                     ident_vector2.push_back(": " + l2);
                   }
                   | IF bool_exp THEN statements ENDIF
                   {
@@ -165,7 +221,7 @@ statement:        var ASSIGN expression
                      ident_vector2.push_back(": " + l2);
                   }
                   | IF bool_exp THEN statements ELSE statements ENDIF
-                  {
+                  { 
                      string l1 = doLabel();
                      string l2 = doLabel();
                      string l3 = doLabel();
@@ -173,6 +229,7 @@ statement:        var ASSIGN expression
                      label_vector_temp.pop_back();
                      ident_vector2.push_back(":= " + l2);
                      ident_vector2.push_back(": " + l3);
+
                   }
                   | DO BEGINLOOP statements ENDLOOP WHILE bool_exp 
                   {
@@ -186,8 +243,8 @@ statement:        var ASSIGN expression
                   }
                   | CONTINUE {}
                   | RETURN expression {}
-                     
-                  | READ var { ident_vector2.push_back(".< " + ident_vector_temp.back()); ident_vector_temp.pop_back();}
+                  | WRITE var { ident_vector2.push_back(".> " + ident_vector_temp.back()); ident_vector_temp.pop_back();}
+                  | READ var vars { ident_vector2.push_back(".< " + ident_vector_temp.back()); ident_vector_temp.pop_back();}
                   ;
 bool_exp:         relation_and_exp {}
                   | bool_exp OR relation_and_exp {}
@@ -195,16 +252,19 @@ bool_exp:         relation_and_exp {}
 relation_and_exp: relation_exp1 {}
                   | relation_and_exp AND relation_exp1 {}
                   ;
-relation_exp1:    expression comp expression
+relation_exp1:    expression comp relation_exp1
+                  | TRUE
+                  | FALSE
+                  | expression
                   ;
-comp:             EQ {comp_stuff.push_back("GT");}
-                  | NEQ {comp_stuff.push_back("GT");}
-                  | LT {comp_stuff.push_back("GT");}
+comp:             EQ {comp_stuff.push_back("EQ");}
+                  | NEQ {comp_stuff.push_back("NEQ");}
+                  | LT {comp_stuff.push_back("LT");}
                   | GT {comp_stuff.push_back("GT");}
                   | LTE {comp_stuff.push_back("LTE");}
-                  | GTE {comp_stuff.push_back("GT");}
+                  | GTE {comp_stuff.push_back("GTE");}
                   ;
-vars:             var COMMA vars
+vars:             COMMA var vars
                   {
                      string t = declareTemp();
                      ident_vector_type.push_back("int");
@@ -227,21 +287,19 @@ var:              IDENT
                   }
                   | IDENT L_SQUARE_BRACKET expression R_SQUARE_BRACKET 
                   {
-                     /* ident_vector = symbols
-                        ident_vector_type = symbolTypes
-                        ident_vector2 = statements
-                        ident_vector_temp =  cross 
-                        ops = label_vector_temp */
+                     string s1 = declareTemp();
+                     ident_vector_type.push_back("int");
+                     ident_vector2.push_back(".< " + s1);
+                     ident_vector2.push_back(string("[]= ") + $1 + ", " + to_string(numTemp));
                   }
                   ;
 expressions:	   expressions COMMA expression
                   | expression
                   ;
-expression:       multip_exp
+expression:       multip_exp 
                   | multip_exp ADD multip_exp 
                   {
                      string s1 = declareTemp();
-                     ident_vector.push_back(s1);
                      ident_vector_type.push_back("int");
 
                      string s2 = ident_vector_temp.back();
@@ -253,6 +311,7 @@ expression:       multip_exp
                      label_vector_temp.push_back(s1);
                   }
                   | multip_exp SUB multip_exp
+                  | multip_exp ADD multip_exp SUB multip_exp
                   ;
 multip_exp:	      term DIV term {
                      string s1 = declareTemp();
@@ -288,7 +347,12 @@ multip_exp:	      term DIV term {
                   ;
 term:	            var {fromExp = true;}
                   | NUMBER
-                  | L_PAREN expression R_PAREN
+                  {
+                     string s1 = declareTemp();
+                     ident_vector_type.push_back("int");
+                     ident_vector2.push_back("= " + s1 + ", " + to_string($1));
+                     label_vector_temp.push_back(s1);
+                  }
                   | SUB var
                   | SUB NUMBER
                   | SUB L_PAREN expression R_PAREN
